@@ -12,7 +12,7 @@ body {
   background-color: #f2f4f8;
   margin: 0;
   box-sizing: border-box;
-  min-height: 100vh;
+  min-height: 120vh;
 }
 
 a {
@@ -142,7 +142,7 @@ button {
 }
 
 .navbar {
-  position: sticky;
+  position: fixed;
   left: 0;
   bottom: 0;
   right: 0;
