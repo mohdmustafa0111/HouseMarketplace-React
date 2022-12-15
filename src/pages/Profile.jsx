@@ -1,5 +1,5 @@
-import React from "react";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { getAuth, updateProfile } from "firebase/auth";
 import {
   updateDoc,
@@ -12,7 +12,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase.config";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ListingItem from "../components/ListingItem";
 import arrowRight from "../assets/svg/keyboardArrowRightIcon.svg";
@@ -30,29 +30,35 @@ function Profile() {
 
   const { name, email } = formData;
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserListings = async () => {
       const listingsRef = collection(db, "listings");
+
       const q = query(
         listingsRef,
         where("userRef", "==", auth.currentUser.uid),
         orderBy("timestamp", "desc")
       );
+
       const querySnap = await getDocs(q);
+
       let listings = [];
+
       querySnap.forEach((doc) => {
         return listings.push({
           id: doc.id,
           data: doc.data(),
         });
       });
+
       setListings(listings);
       setLoading(false);
     };
+
     fetchUserListings();
   }, [auth.currentUser.uid]);
-
-  const navigate = useNavigate();
 
   const onLogout = () => {
     auth.signOut();
@@ -74,6 +80,7 @@ function Profile() {
         });
       }
     } catch (error) {
+      console.log(error);
       toast.error("Could not update profile details");
     }
   };
@@ -95,6 +102,8 @@ function Profile() {
       toast.success("Successfully deleted listing");
     }
   };
+
+  const onEdit = (listingId) => navigate(`/edit-listing/${listingId}`);
 
   return (
     <div className="profile">
@@ -130,7 +139,7 @@ function Profile() {
               onChange={onChange}
             />
             <input
-              type="text"
+              type="email"
               id="email"
               className={!changeDetails ? "profileEmail" : "profileEmailActive"}
               disabled={!changeDetails}
@@ -156,6 +165,7 @@ function Profile() {
                   listing={listing.data}
                   id={listing.id}
                   onDelete={() => onDelete(listing.id)}
+                  onEdit={() => onEdit(listing.id)}
                 />
               ))}
             </ul>
